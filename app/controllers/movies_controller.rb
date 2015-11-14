@@ -11,7 +11,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    if !params[:sort] && session[:sort] && !params[:ratings] && session[:ratings]
+    if !params[:sort] && session[:sort] || !params[:ratings] && session[:ratings]
       redirect = true
     end
     
