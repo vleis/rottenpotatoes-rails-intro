@@ -11,7 +11,24 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    if !params[:sort] && session[:sort] && !params[:ratings] && session[:ratings]
+      redirect = true
+    end
+    
+    redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings]) if redirect
+    
+    @sorting = params[:sort] || session[:sort]
+    if !params[:ratings] || params[:ratings].keys.empty?
+      @ratings = session[:ratings]
+    else
+      @ratings = params[:ratings]
+    end
+    
+    Rails.logger.info("Sorting: #{@sorting}")
+    @movies = Movie.all.where(:rating => (!@ratings || @ratings.keys.empty? ? Movie.all_ratings : @ratings.keys)).order(@sorting)
+    @all_ratings = Movie.all_ratings
+    session[:sort] = @sorting
+    session[:ratings] = @ratings || Hash[Movie.all_ratings.zip([1])]
   end
 
   def new
