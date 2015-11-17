@@ -12,10 +12,8 @@ class MoviesController < ApplicationController
 
   def index
     if !params[:sort] && session[:sort] || !params[:ratings] && session[:ratings]
-      redirect = true
+      redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings])
     end
-    
-    redirect_to movies_path(:sort => session[:sort], :ratings => session[:ratings]) if redirect
     
     @sorting = params[:sort] || session[:sort]
     if !params[:ratings] || params[:ratings].keys.empty?
@@ -24,7 +22,6 @@ class MoviesController < ApplicationController
       @ratings = params[:ratings]
     end
     
-    Rails.logger.info("Sorting: #{@sorting}")
     @movies = Movie.all.where(:rating => (!@ratings || @ratings.keys.empty? ? Movie.all_ratings : @ratings.keys)).order(@sorting)
     @all_ratings = Movie.all_ratings
     session[:sort] = @sorting
